@@ -1,0 +1,55 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 50px 50px 50px;
+  background-color: rgba(165, 42, 42, 0.295);
+  border-radius: 20px;
+  gap: 20px;
+  align-items: center;
+  width: 300px;
+}
+
+.login input {
+  border-radius: 20px;
+  background-color: aliceblue;
+  padding: 10px;
+  color: black;
+}
+
+.login button {
+  height: 60px;
+}
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  width: 100%;
+  max-width: 280px;
+  height: 50px;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.google-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+button {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
