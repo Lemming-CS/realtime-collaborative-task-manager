@@ -9,6 +9,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { sendEmailVerification } from "firebase/auth";
 
 function Register() {
+
     const [email, setEmail] = useState("");
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
@@ -69,6 +70,10 @@ function Register() {
         value={password}
         onChange={e => setPassword(e.target.value)}
       />
+      <span className="error">{errorMessage}</span>
+      <button onClick={handleRegister}>Register</button>
+      <Link to="/login" id="redirect">Login Page</Link>
+    </div>
       {showModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
@@ -85,10 +90,6 @@ function Register() {
           </div>
         </div>
       )}
-      <span className="error">{errorMessage}</span>
-      <button onClick={handleRegister}>Register</button>
-      <Link to="/login" id="redirect">Login Page</Link>
-    </div>
     </>
 }
 export default Register;

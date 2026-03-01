@@ -5,11 +5,15 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
 import { useNavigate } from "react-router-dom";
 import defaultUserIMG from "../assets/defaultUser.png"
+import sun from "../assets/sun.png";
+import moon from "../assets/moon.png"
 
 function Home() {
   const user = useStore(state => state.user);
   const setUser = useStore(state => state.setUser);
   const navigate = useNavigate();
+  const theme = useStore(state => state.theme);
+  const toggleTheme = useStore(state => state.toggleTheme);
 
   const navProfile = () => {
     navigate('/profile');
@@ -36,7 +40,12 @@ function Home() {
           <img src={defaultUserIMG} />
           {user.username}
         </button>
-        <button onClick={logOut}>Log Out</button>
+        <div className={styles.headerRight}> 
+          <button onClick={toggleTheme} id="themeButton">
+            {theme === "light" ? <img src={sun}/> : <img src={moon}/>}
+          </button>
+          <button onClick={logOut}>Log Out</button>    
+        </div>
       </div>
       <h1>Home</h1>
       {user && <p>Welcome, {user.username}</p>}

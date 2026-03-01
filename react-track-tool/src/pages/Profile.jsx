@@ -34,6 +34,11 @@ function Profile() {
             <button onClick={navHome}>Home</button>
             <button onClick={logOut}>Log Out</button>
         </div>
+        <div className="profile">
+            <div>
+                <button><img /></button>
+            </div>
+        </div>
     </div>
     )
 }
