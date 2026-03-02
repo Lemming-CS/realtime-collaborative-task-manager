@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { db } from "../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
 import { sendEmailVerification } from "firebase/auth";
-
+import Header from "../components/Header";
 function Register() {
 
     const [email, setEmail] = useState("");
@@ -50,6 +50,7 @@ function Register() {
     }
 
   return <>
+  <Header />
     <div className={styles.register}>
       <h1>Register</h1>
       <input

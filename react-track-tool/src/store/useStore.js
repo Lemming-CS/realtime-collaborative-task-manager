@@ -5,12 +5,14 @@ export const useStore = create(
   persist(
     (set) => ({
       user: null,
-      theme: 'light',
+      theme: localStorage.getItem("theme") || "dark",
       setUser: (user) => set({ user }),
       toggleTheme: () =>
-        set((state) => ({
-          theme: state.theme === 'light' ? 'dark' : 'light'
-        })),
+        set(state => {
+          const newTheme = state.theme === "light" ? "dark" : "light";
+          localStorage.setItem("theme", newTheme);
+          return { theme: newTheme };
+        }),
     }),
     {
       name: 'app-storage',

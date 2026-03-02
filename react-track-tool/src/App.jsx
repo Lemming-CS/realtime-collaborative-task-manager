@@ -5,10 +5,13 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile.jsx";
 import { useStore } from "./store/useStore.js";
 import { Navigate } from "react-router-dom";
+import { useThemeEffect } from "./hooks/useThemeEffect.jsx";
+import { useAuthListener } from "./hooks/useAuthListener.jsx";
 
 function App() {
   const user = useStore(state => state.user);
-
+  useThemeEffect();
+  useAuthListener();
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

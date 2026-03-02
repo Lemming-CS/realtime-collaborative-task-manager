@@ -1,0 +1,42 @@
+.container {
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px 30px;
+
+  background: var(--header-bg);
+  border-radius: 12px;
+}
+
+.header button {
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+.headerRight {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: var(--button-bg);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.profileImage {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}

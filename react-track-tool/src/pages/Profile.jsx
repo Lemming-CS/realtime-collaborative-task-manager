@@ -6,9 +6,7 @@ import { signOut, onAuthStateChanged } from "firebase/auth";
 import styles from "./static/Profile.module.css";
 import { useEffect } from "react";
 import { useStore } from "../store/useStore";
-import sun from "../assets/sun.png";
-import moon from "../assets/moon.png";
-
+import Header from "../components/Header";
 function Profile() {
     const setUser = useStore(state => state.setUser);
     const navigate = useNavigate();
@@ -22,28 +20,10 @@ function Profile() {
     const logOut = () => {
         signOut(auth);
     }
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            setUser(null);
-            navigate('/login');
-        }
-        });
-        return () => unsubscribe();
-    }, []);
 
     return (
     <div className={styles.container}>
-        <div className={styles.header}>
-            <button onClick={navHome}>Home</button>
-            <div className="headerRight"> 
-                <button onClick={toggleTheme} id="themeButton">
-                    {theme === "light" ? <img src={sun}/> : <img src={moon}/>}
-                </button>
-                <button onClick={logOut}>Log Out</button>
-            </div>
-
-        </div>
+        <Header showHome />
         <div className="profile">
             <div>
                 <button><img /></button>

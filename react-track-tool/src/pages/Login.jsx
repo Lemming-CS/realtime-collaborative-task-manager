@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import {db, auth} from "../firebase/config.js";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useStore } from "../store/useStore.js";
+import Header from "../components/Header.jsx";
 
 function Login() {
 
@@ -19,7 +20,9 @@ function Login() {
   async function getFirestoreInfo(user) {
       const userDoc = doc(db, "users", user.uid);
       const userSnap = await getDoc(userDoc);
-      await setUser(userSnap.data());
+      if (userSnap.exists()) {
+        setUser(userSnap.data());
+      }
   }
 
   const handleLogin = async () => {
@@ -78,6 +81,8 @@ function Login() {
   };
 
   return (
+    <>
+    <Header/>
     <div className={styles.login}>
       <h1>Login</h1>
       <input
@@ -103,6 +108,7 @@ function Login() {
       </Link>
 
     </div>
+  </>
   )}
 
 export default Login;
