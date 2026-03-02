@@ -22,17 +22,17 @@ function Register() {
           setErrorMessage("Username shouldn't be empty!");
           return;
         }
-        else if (userName.length < 3 || userName.length > 20) {
+        else if (userName.trim().length < 3 || userName.trim().length > 20) {
           setErrorMessage("Username must have length between 3 and 20 characters!")
           return;
         }
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            await sendEmailVerification(user);
+            sendEmailVerification(user);
 
             await setDoc(doc(db, "users", user.uid), {
-                username: userName,
+                username: userName.trim(),
                 email: user.email,
                 createdAt: new Date()
               });

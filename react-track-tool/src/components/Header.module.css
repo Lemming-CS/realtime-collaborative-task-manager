@@ -14,10 +14,9 @@
 }
 
 .header button {
-    padding: 10px;
-    display: flex;
-    gap: 10px;
+  min-height: 60px;
 }
+
 .headerRight {
   display: flex;
   gap: 15px;
@@ -35,8 +34,3 @@
   padding: 8px 12px;
 }
 
-.profileImage {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}

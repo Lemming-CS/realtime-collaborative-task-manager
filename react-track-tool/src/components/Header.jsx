@@ -25,7 +25,7 @@ return (
       )}
 
       {showProfile && user && (
-        <button onClick={() => navigate("/profile")}>
+        <button onClick={() => navigate("/profile")} className={styles.profileButton}>
           <img src={defaultUser} />
           {user.username}
         </button>

@@ -8,23 +8,14 @@ import {db, auth} from "../firebase/config.js";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useStore } from "../store/useStore.js";
 import Header from "../components/Header.jsx";
+import getFirestoreInfo from "../store/getFirestoreInfo";
 
 function Login() {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const setUser = useStore( state => state.setUser);
-
-  async function getFirestoreInfo(user) {
-      const userDoc = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userDoc);
-      if (userSnap.exists()) {
-        setUser(userSnap.data());
-      }
-  }
-
   const handleLogin = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -34,7 +25,6 @@ function Login() {
         return;
       }
       await getFirestoreInfo(user);
-      console.log("Logged in:", userCredential.user);
       navigate("/");
     }
       catch (error) {
@@ -64,15 +54,17 @@ function Login() {
       const userSnap = await getDoc(userDocRef);
 
       if (!userSnap.exists()) {
-        await setDoc(userDocRef, {
+        const newUser = {
           username: user.displayName || "New User",
           email: user.email,
           createdAt: new Date()
-        });
+        };
+        await setDoc(userDocRef, newUser);
+        setUser(newUser);
       }
-
-      await getFirestoreInfo(user);
-      console.log("Google login:", user);
+      else {
+        await getFirestoreInfo(user);
+      }
       navigate("/");
     }
     catch (error) {
