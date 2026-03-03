@@ -49,7 +49,42 @@ input {
   transition: all 0.2s ease;
 }
 
-.changeUsername {
+.changeCredentials {
   display: flex;
   gap: 20px;
+}
+
+#fullImage {
+  height: 400px;
+  width: 400px;
+  border-radius: 0;
+}
+
+.profileButtons {
+  display: flex;
+  gap: 20px;
+}
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 12px;
+  width: fit-content;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
 }
