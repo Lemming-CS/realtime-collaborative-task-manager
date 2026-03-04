@@ -20,8 +20,26 @@ function PublicProfile() {
             const userRef = doc(db, "users", uid);
             const docSnap = await getDoc(userRef);
             if (docSnap.exists()) {
-                setUserData(docSnap.data());
-                setCreated(docSnap.data()?.createdAt ? new Date(docSnap.data().createdAt).toLocaleDateString() : "—");
+            const data = docSnap.data();
+            setUserData(data);
+            
+            const v = data.createdAt;
+            if (v?.toDate) {
+                setCreated(v.toDate().toLocaleDateString());
+            }
+            else if (v instanceof Date) {
+                setCreated(v.toLocaleDateString());
+            }
+            else if (typeof v === "number") {
+                setCreated(new Date(v).toLocaleDateString());
+            }
+            else if (typeof v === "string") {
+                const d = new Date(v);
+                setCreated(isNaN(d.getTime()) ? "—" : d.toLocaleDateString());
+            }
+            else {
+                setCreated("—");
+            }
             } else {
                 setUserData("Not Found");
             }

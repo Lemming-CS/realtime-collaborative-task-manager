@@ -17,7 +17,6 @@ export default function EditTasksModal({ projectId, task, members = [] }) {
   const [err, setErr] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // когда открываем — заполняем полями текущей задачи
   useEffect(() => {
     if (!open || !task) return;
 
@@ -27,7 +26,6 @@ export default function EditTasksModal({ projectId, task, members = [] }) {
     setPriority(task.priority || "Normal");
     setAssignedTo(task.assignedTo || "");
 
-    // firestore Timestamp -> yyyy-mm-dd
     if (task.deadline?.toDate) {
       const d = task.deadline.toDate();
       const yyyy = d.getFullYear();

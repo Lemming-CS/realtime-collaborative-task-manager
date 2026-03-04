@@ -204,6 +204,9 @@ function Profile() {
                 <div className={styles.profileData}>
                     <button className={styles.profileImage} onClick={() => setShowModal(true)}>
                         <img src={user.profilePicture || defaulUser}/>
+                            <div className={styles.editOverlay}>
+                                ✏️
+                            </div>
                         <input type="file" id="fileInput" ref={imageRef} accept="image/png, image/jpeg, image/jpg" onChange={(e) => changeProfilePic(e.target.files[0])} hidden/>
                     </button>
                     <h3>{user.username}</h3>

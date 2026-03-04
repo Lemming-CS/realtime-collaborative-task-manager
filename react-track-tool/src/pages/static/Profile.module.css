@@ -45,11 +45,18 @@ textarea {
   gap: 20px;
 }
 .profileImage {
-  background-color: rgba(0, 0, 0, 0);
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  position: relative;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
 
+.profileImage img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  transition: 0.25s;
 }
 
 .profileImage:hover {
@@ -58,6 +65,7 @@ textarea {
 }
 .profileInfo {
   display: flex;
+  align-items: center;
   gap: 30px;
 }
 input {
@@ -129,4 +137,25 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+.editOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: white;
+  opacity: 0;
+  transition: 0.25s;
+}
+
+.profileImage:hover img {
+  filter: brightness(0.75);
+}
+
+.profileImage:hover .editOverlay {
+  opacity: 1;
 }
