@@ -1,6 +1,6 @@
 # Realtime Collaborative Task Manager
 
-🔗 **Live Demo:** realtime-collaborative-task-manager.vercel.app/
+🔗 **Live Demo:** https://realtime-collaborative-task-manager.vercel.app/
 
 A real-time task tracking tool for small teams — built with React, Zustand, and Firebase.
 
