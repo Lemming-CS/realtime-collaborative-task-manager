@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./static/CreateProjectModal.module.css";
+import { serverTimestamp } from "firebase/firestore";
 
 export default function CreateProjectModal({ open, onClose, onCreate }) {
   const [title, setTitle] = useState("");

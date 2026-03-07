@@ -69,7 +69,6 @@ function Home() {
       deadline: deadline || null,
       ownerId: user.uid,
       members: [user.uid],
-      ownerUsername: user.username,
       createdAt: serverTimestamp(),
     };
 
@@ -124,7 +123,6 @@ function Home() {
         <div className={styles.projects}>
           {projects.map((p) => {
             const isOwner = p.ownerId === user.uid;
-
             return (
               <div key={p.id} className={styles.projectCard}>
                 <div className={styles.projectTop}>
@@ -137,7 +135,7 @@ function Home() {
                 </div>
 
                 {p.description && <p className={styles.desc}>{p.description}</p>}
-
+                {p.deadline && <p className={styles.desc}>Deadlne: {p.deadline}</p>}
                 <div className={styles.projectActions}>
                   <button onClick={() => navigate(`/project/${p.id}`)}>Open</button>
                   {isOwner ? (

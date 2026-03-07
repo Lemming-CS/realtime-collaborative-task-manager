@@ -175,6 +175,7 @@ function Project() {
         <div>
         <h1 className={styles.title}>{project.title}</h1>
         {project.description && <p className={styles.desc}>{project.description}</p>}
+        {project.deadline && <p>Deadline: {project.deadline}</p>}
         {isOwner && (
             <button onClick={() => setOpenInvite(true)}>
                 + Add collaborator
