@@ -4,6 +4,11 @@ A real-time task tracking tool for small teams — built with React, Zustand, an
 
 🔗 **Live Demo:** https://realtime-collaborative-task-manager.vercel.app/
 
+![HomeWhite](/docs/HomeBlack.png)
+![Project](/docs/ProjectBlack.png)
+![ProfileWhite](/docs/ProfileWhite.png)
+![CreateTaskBlack](/docs/CreateTaskBlack.png)
+![CreateProjectWhite](/docs/CreateProjectWhite.png)
 ---
 
 ## Features
