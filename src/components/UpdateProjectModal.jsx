@@ -49,13 +49,13 @@ export default function UpdateProjectModal({ open, onClose, onUpdate, project, o
         description: description.trim(),
         deadline: deadline || null
       };
-
+      setSaving(true);
       if (project) {
         await onUpdate(data, project);
       } else {
         await onCreate(data);
       }
-
+      setSaving(false);
       onClose();
     };
 
@@ -99,9 +99,9 @@ export default function UpdateProjectModal({ open, onClose, onUpdate, project, o
                     <button type="button" className={styles.secondary} onClick={onClose}>
                       Cancel
                     </button>
-                <button type="submit">
-                  {saving ? "Saving..." : project ? "Save" : "Create"}
-                </button>
+                  <button type="submit">
+                    {saving ? "Saving..." : project ? "Save" : "Create"}
+                  </button>
                 </div>
                 </form>
             </div>
