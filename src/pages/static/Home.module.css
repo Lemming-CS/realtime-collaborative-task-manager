@@ -148,13 +148,20 @@
 .projectActions {
   margin-top: auto;
   display: flex;
+  gap: 15px;
   flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
 }
 
 .openBtn {
   background: var(--accent);
   color: white;
+  flex: 1;
+}
+
+.topRowButtons {
+  display: flex;
+  gap: 10px;
 }
 
 .openBtn:hover {
@@ -164,10 +171,12 @@
 
 .secondaryBtn {
   border: 1px solid var(--border);
+  flex: 2;
 }
 
 .dangerBtn {
   background: var(--danger-soft);
+  flex: 2;
   color: var(--danger);
   border: 1px solid rgba(255, 93, 93, 0.2);
 }
@@ -185,4 +194,5 @@
   .primaryCta {
     width: 100%;
   }
+
 }

@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase/config";
 
 function PublicProfile() {
-    const { uid } = useParams()
+    const { uid } = useParams();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [userData, setUserData] = useState(null);

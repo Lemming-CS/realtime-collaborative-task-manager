@@ -2,7 +2,7 @@ import styles from "./static/Home.module.css";
 import { useEffect, useState } from "react";
 import { useStore } from "../store/useStore";
 import Header from "../components/Header";
-import CreateProjectModal from "../components/CreateProjectModal";
+import UpdateProjectModal from "../components/UpdateProjectModal";
 import {
   collection,
   query as fsQuery,
@@ -25,8 +25,8 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!user?.uid) return;
 
@@ -74,6 +74,20 @@ function Home() {
     await setDoc(projectRef, payload);
   };
 
+  const updateProject = async ({ title, description, deadline}, project) => {
+    setErr("");
+    if (!user?.uid) return;
+
+    console.log(project.id)
+    const projectRef = doc(db, "projects", project.id);
+    const payload = {
+      title,
+      description: description || "",
+      deadline: deadline || null,
+    };
+    await updateDoc(projectRef, payload);
+  };
+
   const deleteProject = async (projectId) => {
     setErr("");
     try {
@@ -110,15 +124,17 @@ function Home() {
             </p>
           </div>
 
-          <button className={styles.primaryCta} onClick={() => setOpenCreate(true)}>
+          <button className={styles.primaryCta} onClick={() => {setEditingProject(null); setOpenCreate(true)}}>
             + Create project
           </button>
         </div>
 
-        <CreateProjectModal
+        <UpdateProjectModal
           open={openCreate}
-          onClose={() => setOpenCreate(false)}
+          onClose={() => {setEditingProject(null); setOpenCreate(false)}}
           onCreate={createProject}
+          onUpdate={updateProject}
+          project={editingProject}
         />
 
         {loading && <p className={styles.infoText}>Loading projects…</p>}
@@ -156,14 +172,19 @@ function Home() {
                 )}
 
                 <div className={styles.projectActions}>
-                  <button
-                    className={styles.openBtn}
-                    onClick={() => navigate(`/project/${p.id}`)}
-                  >
-                    Open
-                  </button>
 
-                  {isOwner ? (
+                  <div className={styles.topRowButtons}>    
+                    <button
+                      className={styles.openBtn}
+                      onClick={() => navigate(`/project/${p.id}`)}
+                    >
+                      Open
+                    </button>
+                    <button className={styles.openBtn} onClick={() => {setEditingProject(p); setOpenCreate(true)}}>
+                      Edit
+                    </button>     
+                  </div>
+                    {isOwner ? (
                     <button
                       className={styles.dangerBtn}
                       onClick={() => deleteProject(p.id)}
@@ -177,7 +198,7 @@ function Home() {
                     >
                       Leave project
                     </button>
-                  )}
+                  )}    
                 </div>
               </div>
             );
