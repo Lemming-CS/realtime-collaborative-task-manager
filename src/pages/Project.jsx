@@ -104,11 +104,15 @@ function Project() {
       try {
         const uids = project.members;
         const chunks = [];
-        for (let i = 0; i < uids.length; i += 10) chunks.push(uids.slice(i, i + 10));
+        for (let i = 0; i < uids.length; i += 10)
+          chunks.push(uids.slice(i, i + 10));
 
         const all = [];
         for (const chunk of chunks) {
-          const q = query(collection(db, "users"), where(documentId(), "in", chunk));
+          const q = query(
+            collection(db, "users"),
+            where(documentId(), "in", chunk),
+          );
           const snap = await getDocs(q);
           snap.docs.forEach((d) => all.push({ uid: d.id, ...d.data() }));
         }
@@ -134,7 +138,7 @@ function Project() {
 
     const q = query(
       collection(db, "projects", projectId, "tasks"),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
     const unsub = onSnapshot(
@@ -145,7 +149,7 @@ function Project() {
       (e) => {
         console.error(e);
         setErr(e.code || e.message);
-      }
+      },
     );
 
     return () => unsub();
@@ -155,12 +159,11 @@ function Project() {
     setErr("");
     try {
       await deleteDoc(doc(db, "projects", projectId, "tasks", taskId));
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message);
       setErr(e.code || e.message);
     }
-  }
+  };
 
   const statusClass = (status) => {
     const s = (status || "").toLowerCase();
@@ -191,132 +194,155 @@ function Project() {
   if (!allowed || !project) return null;
 
   return (
-    <div className={styles.page}>
+    <>
       <Header showHome showProfile showBell />
-
-      <div className={styles.hero}>
-        <div className={styles.heroMain}>
-          <p className={styles.eyebrow}>Project workspace</p>
-          <div className={styles.titleRow}>
-            <h1 className={styles.title}>{project.title}</h1>
-            <span className={styles.roleBadge}>{isOwner ? "Owner" : "Member"}</span>
-          </div>
-
-          {project.description && <p className={styles.desc}>{project.description}</p>}
-          {project.deadline && <p className={styles.projectMeta}>Deadline: {project.deadline}</p>}
-
-          {isOwner && (
-            <button
-              className={styles.inviteBtn}
-              onClick={() => setOpenInvite(true)}
-            >
-              + Add collaborator
-            </button>
-          )}
-
-          <InviteMemberModal
-            open={openInvite}
-            onClose={() => setOpenInvite(false)}
-            project={{ ...project, id: projectId }}
-          />
-
-          <div className={styles.collabBlock}>
-            <h3 className={styles.collabTitle}>Collaborators</h3>
-
-            <div className={styles.collabList}>
-              {collabs.map((u) => (
-                <button
-                  key={u.uid}
-                  type="button"
-                  className={styles.collabItem}
-                  onClick={() => navigate(`/profile/${u.uid}`)}
-                  title={`Open ${u.username}'s profile`}
-                >
-                  <img
-                    className={styles.collabAvatar}
-                    src={u.profilePicture || defaultUser}
-                    alt={u.username}
-                  />
-                  <span className={styles.collabName}>
-                    {u.username || u.uid.slice(0, 6)}
-                    {u.uid === me.uid ? " (you)" : ""}
-                    {u.uid === project.ownerId ? " • owner" : ""}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.heroSide}>
-          <CreateTaskModal projectId={projectId} members={project.members || []} />
-        </div>
-      </div>
-
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Tasks</h2>
-        <p className={styles.sectionSub}>Track progress, assignments, and deadlines.</p>
-      </div>
-
-      <div className={styles.taskGrid}>
-        {tasks.map((t) => (
-          <div key={t.id} className={styles.taskCard}>
-            <div className={styles.taskHead}>
-              <div className={styles.taskTitleBlock}>
-                <h3 className={styles.taskTitle}>{t.title}</h3>
-                <span className={`${styles.statusChip} ${statusClass(t.status)}`}>
-                  {t.status || "To Do"}
-                </span>
-              </div>
-
-              <EditTasksModal
-                projectId={projectId}
-                task={t}
-                members={project.members || []}
-              />
+      <div className={styles.page}>
+        <div className={styles.hero}>
+          <div className={styles.heroMain}>
+            <p className={styles.eyebrow}>Project workspace</p>
+            <div className={styles.titleRow}>
+              <h1 className={styles.title}>{project.title}</h1>
+              <span className={styles.roleBadge}>
+                {isOwner ? "Owner" : "Member"}
+              </span>
             </div>
 
-            {t.description && <p className={styles.taskDesc}>{t.description}</p>}
+            {project.description && (
+              <p className={styles.desc}>{project.description}</p>
+            )}
+            {project.deadline && (
+              <p className={styles.projectMeta}>Deadline: {project.deadline}</p>
+            )}
 
-            <div className={styles.metaRow}>
-              {t.assignedTo && (
-                <span className={styles.metaPill}>
-                  <span className={styles.metaLabel}>Assigned</span>
+            {isOwner && (
+              <button
+                className={styles.inviteBtn}
+                onClick={() => setOpenInvite(true)}
+              >
+                + Add collaborator
+              </button>
+            )}
+
+            <InviteMemberModal
+              open={openInvite}
+              onClose={() => setOpenInvite(false)}
+              project={{ ...project, id: projectId }}
+            />
+
+            <div className={styles.collabBlock}>
+              <h3 className={styles.collabTitle}>Collaborators</h3>
+
+              <div className={styles.collabList}>
+                {collabs.map((u) => (
                   <button
+                    key={u.uid}
                     type="button"
-                    className={styles.assigneeBtn}
-                    onClick={() => navigate(`/profile/${t.assignedTo}`)}
-                    title="Open assignee profile"
+                    className={styles.collabItem}
+                    onClick={() => navigate(`/profile/${u.uid}`)}
+                    title={`Open ${u.username}'s profile`}
                   >
                     <img
-                      className={styles.assigneeAvatar}
-                      src={collabsById.get(t.assignedTo)?.profilePicture || defaultUser}
-                      alt="assignee"
+                      className={styles.collabAvatar}
+                      src={u.profilePicture || defaultUser}
+                      alt={u.username}
                     />
-                    {collabsById.get(t.assignedTo)?.username || t.assignedTo.slice(0, 6)}
+                    <span className={styles.collabName}>
+                      {u.username || u.uid.slice(0, 6)}
+                      {u.uid === me.uid ? " (you)" : ""}
+                      {u.uid === project.ownerId ? " • owner" : ""}
+                    </span>
                   </button>
-                </span>
-              )}
-
-              <span className={styles.metaPill}>
-                <span className={styles.metaLabel}>Priority</span>
-                <span>{t.priority || "Normal"}</span>
-              </span>
-
-              {t.deadline?.toDate && (
-                <span className={styles.metaPill}>
-                  <span className={styles.metaLabel}>Deadline</span>
-                  <span>{t.deadline.toDate().toLocaleDateString()}</span>
-                </span>
-              )}
+                ))}
+              </div>
             </div>
-            <button className={styles.dangerBtn} onClick={() => deleteTask(t.id)}>
-              Delete Task
-            </button>
           </div>
-        ))}
+
+          <div className={styles.heroSide}>
+            <CreateTaskModal
+              projectId={projectId}
+              members={project.members || []}
+            />
+          </div>
+        </div>
+
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Tasks</h2>
+          <p className={styles.sectionSub}>
+            Track progress, assignments, and deadlines.
+          </p>
+        </div>
+
+        <div className={styles.taskGrid}>
+          {tasks.map((t) => (
+            <div key={t.id} className={styles.taskCard}>
+              <div className={styles.taskHead}>
+                <div className={styles.taskTitleBlock}>
+                  <h3 className={styles.taskTitle}>{t.title}</h3>
+                  <span
+                    className={`${styles.statusChip} ${statusClass(t.status)}`}
+                  >
+                    {t.status || "To Do"}
+                  </span>
+                </div>
+
+                <EditTasksModal
+                  projectId={projectId}
+                  task={t}
+                  members={project.members || []}
+                />
+              </div>
+
+              {t.description && (
+                <p className={styles.taskDesc}>{t.description}</p>
+              )}
+
+              <div className={styles.metaRow}>
+                {t.assignedTo && (
+                  <span className={styles.metaPill}>
+                    <span className={styles.metaLabel}>Assigned</span>
+                    <button
+                      type="button"
+                      className={styles.assigneeBtn}
+                      onClick={() => navigate(`/profile/${t.assignedTo}`)}
+                      title="Open assignee profile"
+                    >
+                      <img
+                        className={styles.assigneeAvatar}
+                        src={
+                          collabsById.get(t.assignedTo)?.profilePicture ||
+                          defaultUser
+                        }
+                        alt="assignee"
+                      />
+                      {collabsById.get(t.assignedTo)?.username ||
+                        t.assignedTo.slice(0, 6)}
+                    </button>
+                  </span>
+                )}
+
+                <span className={styles.metaPill}>
+                  <span className={styles.metaLabel}>Priority</span>
+                  <span>{t.priority || "Normal"}</span>
+                </span>
+
+                {t.deadline?.toDate && (
+                  <span className={styles.metaPill}>
+                    <span className={styles.metaLabel}>Deadline</span>
+                    <span>{t.deadline.toDate().toLocaleDateString()}</span>
+                  </span>
+                )}
+              </div>
+              <button
+                className={styles.dangerBtn}
+                onClick={() => deleteTask(t.id)}
+              >
+                Delete Task
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
