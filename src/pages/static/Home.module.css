@@ -2,6 +2,9 @@
   min-height: 100vh;
 }
 
+.content button {
+  max-height: 49px;
+}
 .content {
   max-width: 1180px;
   margin: 0 auto;

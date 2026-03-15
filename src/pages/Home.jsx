@@ -36,7 +36,7 @@ function Home() {
     const q = fsQuery(
       collection(db, "projects"),
       where("members", "array-contains", user.uid),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
     const unsub = onSnapshot(
@@ -50,7 +50,7 @@ function Home() {
         console.error(error);
         setErr(error.code || "Failed to load projects");
         setLoading(false);
-      }
+      },
     );
 
     return () => unsub();
@@ -74,18 +74,25 @@ function Home() {
     await setDoc(projectRef, payload);
   };
 
-  const updateProject = async ({ title, description, deadline}, project) => {
+  const updateProject = async ({ title, description, deadline }, project) => {
     setErr("");
     if (!user?.uid) return;
 
-    console.log(project.id)
     const projectRef = doc(db, "projects", project.id);
     const payload = {
       title,
       description: description || "",
       deadline: deadline || null,
     };
-    await updateDoc(projectRef, payload);
+    try {
+      await updateDoc(projectRef, payload);
+    } catch (e) {
+      if (e.message == "Missing or insufficient permissions.") {
+        setErr("Only owner could edit the project");
+      } else {
+        setErr(e.message || e.error);
+      }
+    }
   };
 
   const deleteProject = async (projectId) => {
@@ -124,14 +131,23 @@ function Home() {
             </p>
           </div>
 
-          <button className={styles.primaryCta} onClick={() => {setEditingProject(null); setOpenCreate(true)}}>
+          <button
+            className={styles.primaryCta}
+            onClick={() => {
+              setEditingProject(null);
+              setOpenCreate(true);
+            }}
+          >
             + Create project
           </button>
         </div>
 
         <UpdateProjectModal
           open={openCreate}
-          onClose={() => {setEditingProject(null); setOpenCreate(false)}}
+          onClose={() => {
+            setEditingProject(null);
+            setOpenCreate(false);
+          }}
           onCreate={createProject}
           onUpdate={updateProject}
           project={editingProject}
@@ -162,7 +178,9 @@ function Home() {
                   </div>
                 </div>
 
-                {p.description && <p className={styles.desc}>{p.description}</p>}
+                {p.description && (
+                  <p className={styles.desc}>{p.description}</p>
+                )}
 
                 {p.deadline && (
                   <p className={styles.metaLine}>
@@ -172,33 +190,40 @@ function Home() {
                 )}
 
                 <div className={styles.projectActions}>
-
-                  <div className={styles.topRowButtons}>    
+                  <div className={styles.topRowButtons}>
                     <button
                       className={styles.openBtn}
                       onClick={() => navigate(`/project/${p.id}`)}
                     >
                       Open
                     </button>
-                    <button className={styles.openBtn} onClick={() => {setEditingProject(p); setOpenCreate(true)}}>
-                      Edit
-                    </button>     
+                    {isOwner && (
+                      <button
+                        className={styles.openBtn}
+                        onClick={() => {
+                          setEditingProject(p);
+                          setOpenCreate(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    )}
                   </div>
-                    {isOwner ? (
+                  {isOwner ? (
                     <button
                       className={styles.dangerBtn}
                       onClick={() => deleteProject(p.id)}
                     >
                       Delete project
                     </button>
-                  ) : (
-                    <button
-                      className={styles.secondaryBtn}
-                      onClick={() => leaveProject(p.id)}
-                    >
-                      Leave project
-                    </button>
-                  )}    
+                  )  : (
+                      <button
+                        className={styles.secondaryBtn}
+                        onClick={() => leaveProject(p.id)}
+                      >
+                        Leave project
+                      </button>
+                    )}
                 </div>
               </div>
             );
