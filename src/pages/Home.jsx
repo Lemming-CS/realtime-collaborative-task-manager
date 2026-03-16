@@ -59,7 +59,10 @@ function Home() {
   const createProject = async ({ title, description, deadline }) => {
     setErr("");
     if (!user?.uid) return;
-
+    if (title.length < 1) {
+      setErr("Please provide a title");
+      return;
+    }
     const projectRef = doc(collection(db, "projects"));
 
     const payload = {
@@ -70,8 +73,12 @@ function Home() {
       members: [user.uid],
       createdAt: serverTimestamp(),
     };
-
-    await setDoc(projectRef, payload);
+    try {
+      await setDoc(projectRef, payload);
+    }
+    catch (e) {
+      setErr(e.message || e.error);
+    }
   };
 
   const updateProject = async ({ title, description, deadline }, project) => {
