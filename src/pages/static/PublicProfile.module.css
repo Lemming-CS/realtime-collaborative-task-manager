@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 .profile {
-  width: min(960px, calc(100vw - 32px));
+  width: min(960px, 70vw);
   margin: 28px auto 40px;
   padding: 28px;
   display: flex;
@@ -74,13 +74,17 @@
   flex-direction: column;
   gap: 10px;
   flex: 1;
-  min-width: 300px;
-  padding: 10px;
+  min-width: 150px;
 }
 
 .biography label {
   font-weight: 700;
   color: var(--text);
+}
+
+.biography p {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .metaText {
@@ -89,6 +93,9 @@
   font-weight: 600;
 }
 
+.biography, .metaText {
+  padding: 10px;
+}
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -123,7 +130,7 @@
 
 @media (max-width: 768px) {
   .profile {
-    width: min(100vw - 20px, 100%);
+    width: min(100vw - 20px, 90vw);
     margin: 18px auto 28px;
     padding: 18px;
     border-radius: 18px;

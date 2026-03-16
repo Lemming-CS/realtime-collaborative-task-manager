@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 .profile {
-  width: min(960px, calc(100vw - 32px));
+  max-width: min(960px, calc(100vw - 32px));
   margin: 28px auto 40px;
   padding: 28px;
   display: flex;
@@ -33,6 +33,7 @@
   align-items: center;
   gap: 18px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .profileImage {
@@ -87,11 +88,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  flex: 1;
-  min-width: 300px;
-  padding: 10px;
+  flex: 1 1 320px;
+  min-width: 0;
 }
-
 .biography label {
   font-weight: 700;
   color: var(--text);
@@ -105,18 +104,19 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  flex: 1;
-  min-width: 300px;
+  flex: 1 1 320px;
+  min-width: 0;
 }
-
 .changeCredentials {
   display: flex;
   gap: 12px;
   align-items: center;
+  min-width: 0;
 }
 
 .changeCredentials input {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .changeCredentials button,
@@ -141,6 +141,7 @@
   background: var(--danger-soft);
   color: var(--danger);
   border: 1px solid rgba(255, 93, 93, 0.2);
+  margin-top: 10px;
 }
 
 .deleteBtn:hover {
@@ -180,7 +181,11 @@
   object-fit: cover;
   border-radius: 18px;
 }
-
+.profileInfo h3 {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 .profileButtons {
   display: flex;
   gap: 12px;
@@ -190,7 +195,6 @@
 
 @media (max-width: 768px) {
   .profile {
-    width: min(100vw - 20px, 100%);
     margin: 18px auto 28px;
     padding: 18px;
     border-radius: 18px;
