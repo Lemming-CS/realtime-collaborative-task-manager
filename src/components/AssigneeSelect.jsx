@@ -62,7 +62,6 @@ export default function AssigneeSelect({ membersUids, value, onChange }) {
         value={value || ""}
         onChange={(e) => onChange(e.target.value || "")}
         disabled={loading}
-        style={{ width: "100%", padding: "10px 12px", borderRadius: 10 }}
       >
         <option value="">Unassigned</option>
         {users.map((u) => (

@@ -19,58 +19,71 @@ import {
 import { db } from "../firebase/config";
 import { useNavigate } from "react-router-dom";
 
-function Home() {
-  const user = useStore((s) => s.user);
-  const activeUserId = user?.uid ?? null;
-  const [projects, setProjects] = useState([]);
-  const [loadedUserId, setLoadedUserId] = useState(null);
-  const [errState, setErrState] = useState({ userId: null, message: "" });
-  const [openCreate, setOpenCreate] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
-  const navigate = useNavigate();
-
-  const loading = Boolean(activeUserId) && loadedUserId !== activeUserId;
-  const err = errState.userId === activeUserId ? errState.message : "";
-  const visibleProjects = loadedUserId === activeUserId ? projects : [];
-  const setErr = (message) =>
-    setErrState({ userId: activeUserId, message: message || "" });
+function useProjectsFeed(userId) {
+  const [feed, setFeed] = useState({
+    userId: null,
+    projects: [],
+    error: "",
+  });
 
   useEffect(() => {
-    if (!activeUserId) return;
+    if (!userId) return;
 
     const q = fsQuery(
       collection(db, "projects"),
-      where("members", "array-contains", activeUserId),
+      where("members", "array-contains", userId),
       orderBy("createdAt", "desc"),
     );
 
-    const unsub = onSnapshot(
+    const unsubscribe = onSnapshot(
       q,
       (snap) => {
-        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setProjects(data);
-        setLoadedUserId(activeUserId);
-        setErrState({ userId: activeUserId, message: "" });
+        setFeed({
+          userId,
+          projects: snap.docs.map((d) => ({ id: d.id, ...d.data() })),
+          error: "",
+        });
       },
       (error) => {
         console.error(error);
-        setProjects([]);
-        setLoadedUserId(activeUserId);
-        setErrState({
-          userId: activeUserId,
-          message: error.code || "Failed to load projects",
+        setFeed({
+          userId,
+          projects: [],
+          error: error.code || "Failed to load projects",
         });
       },
     );
 
-    return () => unsub();
-  }, [activeUserId]);
+    return () => unsubscribe();
+  }, [userId]);
+
+  return {
+    projects: feed.userId === userId ? feed.projects : [],
+    loading: Boolean(userId) && feed.userId !== userId,
+    error: feed.userId === userId ? feed.error : "",
+  };
+}
+
+function Home() {
+  const user = useStore((s) => s.user);
+  const userId = user?.uid ?? null;
+  const [openCreate, setOpenCreate] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+  const [actionError, setActionError] = useState("");
+  const navigate = useNavigate();
+  const {
+    projects,
+    loading: loadingProjects,
+    error: projectsError,
+  } = useProjectsFeed(userId);
+
+  const errorMessage = actionError || projectsError;
 
   const createProject = async ({ title, description, deadline }) => {
-    setErr("");
+    setActionError("");
     if (!user?.uid) return;
     if (title.length < 1) {
-      setErr("Please provide a title");
+      setActionError("Please provide a title");
       return;
     }
     const projectRef = doc(collection(db, "projects"));
@@ -85,14 +98,16 @@ function Home() {
     };
     try {
       await setDoc(projectRef, payload);
+      setOpenCreate(false);
+      setEditingProject(null);
     }
     catch (e) {
-      setErr(e.message || e.error);
+      setActionError(e.message || e.error);
     }
   };
 
   const updateProject = async ({ title, description, deadline }, project) => {
-    setErr("");
+    setActionError("");
     if (!user?.uid) return;
 
     const projectRef = doc(db, "projects", project.id);
@@ -103,34 +118,36 @@ function Home() {
     };
     try {
       await updateDoc(projectRef, payload);
+      setOpenCreate(false);
+      setEditingProject(null);
     } catch (e) {
       if (e.message == "Missing or insufficient permissions.") {
-        setErr("Only owner could edit the project");
+        setActionError("Only owner could edit the project");
       } else {
-        setErr(e.message || e.error);
+        setActionError(e.message || e.error);
       }
     }
   };
 
   const deleteProject = async (projectId) => {
-    setErr("");
+    setActionError("");
     try {
       await deleteDoc(doc(db, "projects", projectId));
     } catch (e) {
       console.error(e);
-      setErr(e.code || e.message);
+      setActionError(e.code || e.message);
     }
   };
 
   const leaveProject = async (projectId) => {
-    setErr("");
+    setActionError("");
     try {
       await updateDoc(doc(db, "projects", projectId), {
         members: arrayRemove(user.uid),
       });
     } catch (e) {
       console.error(e);
-      setErr(e.code || e.message);
+      setActionError(e.code || e.message);
     }
   };
 
@@ -161,7 +178,7 @@ function Home() {
 
         {openCreate && (
           <UpdateProjectModal
-            open={openCreate}
+            key={editingProject?.id || "create"}
             onClose={() => {
               setEditingProject(null);
               setOpenCreate(false);
@@ -172,10 +189,10 @@ function Home() {
           />
         )}
 
-        {loading && <p className={styles.infoText}>Loading projects…</p>}
-        {err && <p className="error">{err}</p>}
+        {loadingProjects && <p className={styles.infoText}>Loading projects…</p>}
+        {errorMessage && <p className="error">{errorMessage}</p>}
 
-        {!loading && !err && visibleProjects.length === 0 && (
+        {!loadingProjects && !errorMessage && projects.length === 0 && (
           <div className={styles.emptyState}>
             <h3>No projects yet</h3>
             <p>Create your first project to start collaborating.</p>
@@ -183,7 +200,7 @@ function Home() {
         )}
 
         <div className={styles.projects}>
-          {visibleProjects.map((p) => {
+          {projects.map((p) => {
             const isOwner = p.ownerId === user.uid;
 
             return (

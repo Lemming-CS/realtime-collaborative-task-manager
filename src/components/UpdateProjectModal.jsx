@@ -1,47 +1,29 @@
 import { useState } from "react";
 import styles from "./static/UpdateProjectModal.module.css";
 
-function getInitialFormState(project) {
-  if (!project) {
-    return {
-      title: "",
-      description: "",
-      deadline: "",
-    };
-  }
+function formatDeadline(deadline) {
+  if (!deadline) return "";
 
-  let deadline = "";
-  if (project.deadline) {
-    const date = new Date(project.deadline);
-    if (!Number.isNaN(date.getTime())) {
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, "0");
-      const dd = String(date.getDate()).padStart(2, "0");
-      deadline = `${yyyy}-${mm}-${dd}`;
-    }
-  }
+  const date = new Date(deadline);
+  if (Number.isNaN(date.getTime())) return "";
 
-  return {
-    title: project.title || "",
-    description: project.description || "",
-    deadline,
-  };
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 export default function UpdateProjectModal({
-  open,
   onClose,
   onUpdate,
   project,
   onCreate,
 }) {
-  const initialFormState = getInitialFormState(project);
-  const [title, setTitle] = useState(initialFormState.title);
-  const [description, setDescription] = useState(initialFormState.description);
-  const [deadline, setDeadline] = useState(initialFormState.deadline);
+  const isEditing = Boolean(project);
+  const [title, setTitle] = useState(() => project?.title || "");
+  const [description, setDescription] = useState(() => project?.description || "");
+  const [deadline, setDeadline] = useState(() => formatDeadline(project?.deadline));
   const [saving, setSaving] = useState(false);
-
-  if (!open) return null;
 
   const submit = async (e) => {
     e.preventDefault();
@@ -52,19 +34,18 @@ export default function UpdateProjectModal({
       deadline: deadline || null,
     };
     setSaving(true);
-    if (project) {
+    if (isEditing) {
       await onUpdate(data, project);
     } else {
       await onCreate(data);
     }
     setSaving(false);
-    onClose();
   };
 
   return (
     <div className={styles.overlay} onMouseDown={onClose}>
       <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
-        <h2>{project ? "Edit project" : "Create project"}</h2>
+        <h2>{isEditing ? "Edit project" : "Create project"}</h2>
 
         <form onSubmit={submit} className={styles.form}>
           <label>
@@ -103,7 +84,7 @@ export default function UpdateProjectModal({
               Cancel
             </button>
             <button type="submit">
-              {saving ? "Saving..." : project ? "Save" : "Create"}
+              {saving ? "Saving..." : isEditing ? "Save" : "Create"}
             </button>
           </div>
         </form>
