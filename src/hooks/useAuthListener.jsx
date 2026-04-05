@@ -14,5 +14,5 @@ export function useAuthListener() {
     });
 
     return unsubscribe;
-  }, []);
+  }, [setUser]);
 }

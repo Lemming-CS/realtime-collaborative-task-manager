@@ -1,16 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { collection, getDocs, query, where, documentId } from "firebase/firestore";
 import { db } from "../firebase/config";
 import defaultUser from "../assets/defaultUser.png";
 
-export default function AssigneeSelect({ membersUids = [], value, onChange }) {
+const EMPTY_MEMBER_IDS = [];
+
+export default function AssigneeSelect({ membersUids, value, onChange }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const uids = useMemo(
-    () => (membersUids || []),
-    [membersUids]
-  );
+  const uids = Array.isArray(membersUids) ? membersUids : EMPTY_MEMBER_IDS;
 
   useEffect(() => {
     let alive = true;
@@ -49,7 +47,7 @@ export default function AssigneeSelect({ membersUids = [], value, onChange }) {
     return () => {
       alive = false;
     };
-  }, [uids.join(",")]);
+  }, [uids]);
 
   const selectedUser = users.find((u) => u.uid === value);
 

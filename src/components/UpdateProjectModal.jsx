@@ -1,5 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "./static/UpdateProjectModal.module.css";
+
+function getInitialFormState(project) {
+  if (!project) {
+    return {
+      title: "",
+      description: "",
+      deadline: "",
+    };
+  }
+
+  let deadline = "";
+  if (project.deadline) {
+    const date = new Date(project.deadline);
+    if (!Number.isNaN(date.getTime())) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const dd = String(date.getDate()).padStart(2, "0");
+      deadline = `${yyyy}-${mm}-${dd}`;
+    }
+  }
+
+  return {
+    title: project.title || "",
+    description: project.description || "",
+    deadline,
+  };
+}
 
 export default function UpdateProjectModal({
   open,
@@ -8,39 +35,11 @@ export default function UpdateProjectModal({
   project,
   onCreate,
 }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [error, setError] = useState("");
+  const initialFormState = getInitialFormState(project);
+  const [title, setTitle] = useState(initialFormState.title);
+  const [description, setDescription] = useState(initialFormState.description);
+  const [deadline, setDeadline] = useState(initialFormState.deadline);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    if (project) {
-      setTitle(project.title || "");
-      setDescription(project.description || "");
-      let date = null;
-      try {
-        if (project.deadline) {
-          date = new Date(project.deadline);
-        } else {
-          setDeadline("");
-        }
-      } catch (e) {
-        setDeadline("");
-      }
-      if (date) {
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, "0");
-        const dd = String(date.getDate()).padStart(2, "0");
-        setDeadline(`${yyyy}-${mm}-${dd}`);
-      }
-    } else {
-      setTitle("");
-      setDeadline("");
-      setDescription("");
-    }
-  }, [open, project]);
 
   if (!open) return null;
 
@@ -95,9 +94,6 @@ export default function UpdateProjectModal({
               onChange={(e) => setDeadline(e.target.value)}
             />
           </label>
-
-          {error && <div className={styles.error}>{error}</div>}
-
           <div className={styles.actions}>
             <button
               type="button"

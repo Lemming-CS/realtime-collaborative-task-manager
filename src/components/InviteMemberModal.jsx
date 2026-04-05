@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./static/InviteMemberModal.module.css";
 import {
   collection,
@@ -19,7 +19,7 @@ function InviteMemberModal({ open, onClose, project }) {
   const [selected, setSelected] = useState(null);
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isChosen, setIsChosen] = useState(false);
+  const skipNextSearchRef = useRef(false);
   const isOwner = project?.ownerId === auth.currentUser?.uid;
 
   useEffect(() => {
@@ -39,11 +39,10 @@ function InviteMemberModal({ open, onClose, project }) {
       const qRaw = text.trim().toLowerCase();
       if (!qRaw || qRaw.length < 2) {
         setResults([]);
-        setIsChosen(false);
         return;
       }
-      if (isChosen) {
-        setIsChosen(false);
+      if (skipNextSearchRef.current) {
+        skipNextSearchRef.current = false;
         return;
       }
       try {
@@ -74,7 +73,7 @@ function InviteMemberModal({ open, onClose, project }) {
   const choose = (u) => {
     setSelected({ uid: u.uid, username: u.username });
     setText(u.username);
-    setIsChosen(true);
+    skipNextSearchRef.current = true;
     setResults([]);
   };
 

@@ -16,7 +16,8 @@ export default async function getFirestoreInfo(firebaseUser) {
   const createdAtMs =
     data.createdAt?.toMillis ? data.createdAt.toMillis() : null;
 
-  const { createdAt, ...safe } = data;
+  const safe = { ...data };
+  delete safe.createdAt;
 
   setUser({
     uid: firebaseUser.uid,

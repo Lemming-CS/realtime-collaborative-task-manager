@@ -21,21 +21,26 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const user = useStore((s) => s.user);
+  const activeUserId = user?.uid ?? null;
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
+  const [loadedUserId, setLoadedUserId] = useState(null);
+  const [errState, setErrState] = useState({ userId: null, message: "" });
   const [openCreate, setOpenCreate] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!user?.uid) return;
 
-    setLoading(true);
-    setErr("");
+  const loading = Boolean(activeUserId) && loadedUserId !== activeUserId;
+  const err = errState.userId === activeUserId ? errState.message : "";
+  const visibleProjects = loadedUserId === activeUserId ? projects : [];
+  const setErr = (message) =>
+    setErrState({ userId: activeUserId, message: message || "" });
+
+  useEffect(() => {
+    if (!activeUserId) return;
 
     const q = fsQuery(
       collection(db, "projects"),
-      where("members", "array-contains", user.uid),
+      where("members", "array-contains", activeUserId),
       orderBy("createdAt", "desc"),
     );
 
@@ -44,17 +49,22 @@ function Home() {
       (snap) => {
         const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         setProjects(data);
-        setLoading(false);
+        setLoadedUserId(activeUserId);
+        setErrState({ userId: activeUserId, message: "" });
       },
       (error) => {
         console.error(error);
-        setErr(error.code || "Failed to load projects");
-        setLoading(false);
+        setProjects([]);
+        setLoadedUserId(activeUserId);
+        setErrState({
+          userId: activeUserId,
+          message: error.code || "Failed to load projects",
+        });
       },
     );
 
     return () => unsub();
-  }, [user?.uid]);
+  }, [activeUserId]);
 
   const createProject = async ({ title, description, deadline }) => {
     setErr("");
@@ -149,21 +159,23 @@ function Home() {
           </button>
         </div>
 
-        <UpdateProjectModal
-          open={openCreate}
-          onClose={() => {
-            setEditingProject(null);
-            setOpenCreate(false);
-          }}
-          onCreate={createProject}
-          onUpdate={updateProject}
-          project={editingProject}
-        />
+        {openCreate && (
+          <UpdateProjectModal
+            open={openCreate}
+            onClose={() => {
+              setEditingProject(null);
+              setOpenCreate(false);
+            }}
+            onCreate={createProject}
+            onUpdate={updateProject}
+            project={editingProject}
+          />
+        )}
 
         {loading && <p className={styles.infoText}>Loading projects…</p>}
         {err && <p className="error">{err}</p>}
 
-        {!loading && !err && projects.length === 0 && (
+        {!loading && !err && visibleProjects.length === 0 && (
           <div className={styles.emptyState}>
             <h3>No projects yet</h3>
             <p>Create your first project to start collaborating.</p>
@@ -171,7 +183,7 @@ function Home() {
         )}
 
         <div className={styles.projects}>
-          {projects.map((p) => {
+          {visibleProjects.map((p) => {
             const isOwner = p.ownerId === user.uid;
 
             return (

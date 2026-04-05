@@ -1,6 +1,3 @@
-import { auth} from "../firebase/config";
-import { useNavigate } from "react-router-dom";
-import { signOut} from "firebase/auth";
 import styles from "./static/PublicProfile.module.css";
 import Header from "../components/Header";
 import defaulUser from "../assets/defaultUser.png";
@@ -11,7 +8,6 @@ import { db } from "../firebase/config";
 
 function PublicProfile() {
     const { uid } = useParams();
-    const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [userData, setUserData] = useState(null);
     const [created, setCreated] = useState("");
@@ -47,13 +43,6 @@ function PublicProfile() {
         fetchUser();
     }, [uid]);
 
-    const navHome = () => {
-        navigate('/');
-    }
-
-    const logOut = () => {
-        signOut(auth);
-    }
 
     if (!userData) {
         return (

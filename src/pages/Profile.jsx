@@ -1,8 +1,7 @@
-import { updateDoc, doc, getDoc, setDoc, deleteDoc} from 'firebase/firestore';
+import { updateDoc, doc, getDoc, deleteDoc} from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "../firebase/config";
 import { useNavigate } from "react-router-dom";
-import { signOut, onAuthStateChanged } from "firebase/auth";
 import styles from "./static/Profile.module.css";
 import { useEffect, useState } from "react";
 import { useStore } from "../store/useStore";
@@ -11,7 +10,7 @@ import defaulUser from "../assets/defaultUser.png";
 import { deleteObject } from 'firebase/storage';
 import { useRef } from 'react';
 import { updatePassword } from 'firebase/auth';
-import { getAuth, EmailAuthProvider, linkWithCredential } from "firebase/auth";
+import { EmailAuthProvider, linkWithCredential } from "firebase/auth";
 import { sendEmailVerification } from 'firebase/auth';
 import { deleteUser } from "firebase/auth";
 
@@ -131,6 +130,7 @@ function Profile() {
             const storageRef = ref(storage, `profile_pictures/${uid}`);
             await deleteObject(storageRef);
             } catch (e) {
+                setErrorMessage(e.message || e.error);
             }
 
             await deleteDoc(doc(db, "users", uid));
@@ -140,12 +140,11 @@ function Profile() {
             setUser(null);
 
             navigate("/login");
-        } catch (error) {
-            if (error.code === "auth/requires-recent-login") {
+        } catch (e) {
+            if (e.code === "auth/requires-recent-login") {
             alert("Please re-login before deleting your account.");
             } else {
-            console.error(error);
-            setErrorMessage(error.message);
+            setErrorMessage(e.message || e.error);
             }
         }
     };
@@ -169,13 +168,7 @@ function Profile() {
         }
 
     }
-    const navHome = () => {
-        navigate('/');
-    }
 
-    const logOut = () => {
-        signOut(auth);
-    }
 
     const changeUsername = async () => {
         if(usernameChange.trim().length < 3 || usernameChange.trim().length > 20) {

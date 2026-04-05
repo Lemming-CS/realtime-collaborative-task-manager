@@ -21,6 +21,8 @@ import { db } from "../firebase/config";
 import styles from "./static/Project.module.css";
 import defaultUser from "../assets/defaultUser.png";
 
+const EMPTY_MEMBER_IDS = [];
+
 function Project() {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -34,6 +36,7 @@ function Project() {
   const [openInvite, setOpenInvite] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [collabs, setCollabs] = useState([]);
+  const memberIds = project?.members ?? EMPTY_MEMBER_IDS;
 
   const collabsById = useMemo(() => {
     const m = new Map();
@@ -96,13 +99,13 @@ function Project() {
     let alive = true;
 
     async function loadCollabs() {
-      if (!project?.members || project.members.length === 0) {
+      if (memberIds.length === 0) {
         if (alive) setCollabs([]);
         return;
       }
 
       try {
-        const uids = project.members;
+        const uids = memberIds;
         const chunks = [];
         for (let i = 0; i < uids.length; i += 10)
           chunks.push(uids.slice(i, i + 10));
@@ -131,7 +134,7 @@ function Project() {
     return () => {
       alive = false;
     };
-  }, [project?.members?.join(",")]);
+  }, [memberIds]);
 
   useEffect(() => {
     if (!allowed || !projectId) return;
